@@ -1,0 +1,36 @@
+{
+  "name": "printing-plugin",
+  "version": "1.0.0",
+  "description": "A powerful browser printing plugin with custom range, style control, multi-format export, and more",
+  "type": "module",
+  "main": "dist/printing-plugin.umd.js",
+  "module": "dist/printing-plugin.es.js",
+  "exports": {
+    ".": {
+      "import": "./dist/printing-plugin.es.js",
+      "require": "./dist/printing-plugin.umd.js"
+    }
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [
+    "print",
+    "printing",
+    "pdf",
+    "png",
+    "browser-print",
+    "silent-print"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "vite": "^5.0.0"
+  },
+  "dependencies": {
+    "html2canvas": "^1.4.1",
+    "jspdf": "^2.5.1"
+  }
+}
