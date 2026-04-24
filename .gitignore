@@ -1,0 +1,15 @@
+﻿# OS / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Git
+*.log
+
+# Frontend
+node_modules/
+dist/
+
+# Build cache
+**/.cache/

@@ -138,17 +138,25 @@ class PrintingPlugin {
 
     if (target) {
       if (typeof target === 'string') {
-        content = document.querySelector(target);
+        const element = document.querySelector(target);
+        content = this.formCanvasSupport.capture(element);
       } else if (target instanceof HTMLElement) {
-        content = target;
+        content = this.formCanvasSupport.capture(target);
       }
     } else if (options.data.template) {
-      content = this.dataBinding.render(options.data.template, options.data.data);
+      const rendered = this.dataBinding.render(options.data.template, options.data.data);
+      
+      if (typeof rendered === 'string') {
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = rendered;
+        content = wrapper;
+      } else {
+        content = this.formCanvasSupport.capture(rendered);
+      }
     } else {
-      content = this.rangeSelector.select(options.range);
+      const selected = this.rangeSelector.select(options.range);
+      content = this.formCanvasSupport.capture(selected);
     }
-
-    this.formCanvasSupport.capture(content);
 
     return content;
   }

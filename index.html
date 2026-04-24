@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Printing Plugin - 打印插件演示</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #333;
+      background: #f5f5f5;
+    }
+
+    .app-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      border-radius: 12px;
+      margin-bottom: 30px;
+    }
+
+    .header h1 {
+      margin: 0 0 10px 0;
+      font-size: 28px;
+      font-weight: 600;
+    }
+
+    .header p {
+      margin: 0;
+      font-size: 16px;
+      opacity: 0.9;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 20px;
+      background: white;
+      padding: 8px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .nav-tab {
+      padding: 10px 20px;
+      border: none;
+      background: transparent;
+      color: #666;
+      font-size: 14px;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+
+    .nav-tab:hover {
+      background: #f5f5f5;
+    }
+
+    .nav-tab.active {
+      background: #667eea;
+      color: white;
+    }
+
+    .tab-content {
+      display: none;
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .demo-section {
+      margin-bottom: 30px;
+    }
+
+    .demo-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .demo-section h3 {
+      margin: 0 0 15px 0;
+      font-size: 18px;
+      color: #333;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+
+    .demo-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+      align-items: center;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #5a6fd6;
+    }
+
+    .btn-success {
+      background: #52c41a;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #49b018;
+    }
+
+    .btn-warning {
+      background: #faad14;
+      color: white;
+    }
+
+    .btn-warning:hover {
+      background: #e69c12;
+    }
+
+    .btn-danger {
+      background: #ff4d4f;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #e64547;
+    }
+
+    .form-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .form-label {
+      font-size: 13px;
+      color: #666;
+      white-space: nowrap;
+    }
+
+    .form-input,
+    .form-select {
+      padding: 8px 12px;
+      border: 1px solid #d9d9d9;
+      border-radius: 6px;
+      font-size: 14px;
+      min-width: 120px;
+    }
+
+    .form-input:focus,
+    .form-select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+    }
+
+    .print-content {
+      padding: 30px;
+      border: 2px dashed #d9d9d9;
+      border-radius: 8px;
+      background: #fafafa;
+    }
+
+    .invoice-header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #333;
+    }
+
+    .invoice-header h2 {
+      margin: 0 0 10px 0;
+      font-size: 24px;
+    }
+
+    .invoice-header p {
+      margin: 0;
+      color: #666;
+    }
+
+    .invoice-info {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .info-row {
+      display: flex;
+      margin-bottom: 8px;
+    }
+
+    .info-label {
+      font-weight: 600;
+      width: 80px;
+      color: #666;
+    }
+
+    .invoice-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    .invoice-table th,
+    .invoice-table td {
+      border: 1px solid #d9d9d9;
+      padding: 12px;
+      text-align: left;
+    }
+
+    .invoice-table th {
+      background: #f5f5f5;
+      font-weight: 600;
+    }
+
+    .invoice-total {
+      text-align: right;
+      font-size: 18px;
+      font-weight: 600;
+      margin-top: 20px;
+      padding-top: 15px;
+      border-top: 2px solid #333;
+    }
+
+    .form-demo {
+      background: #fafafa;
+      padding: 20px;
+      border-radius: 8px;
+    }
+
+    .form-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-bottom: 15px;
+    }
+
+    .form-field {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .form-field label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+
+    .checkbox-group,
+    .radio-group {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .checkbox-item,
+    .radio-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .canvas-container {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .canvas-box {
+      flex: 1;
+      min-width: 300px;
+    }
+
+    .canvas-box h4 {
+      margin: 0 0 10px 0;
+      font-size: 14px;
+    }
+
+    #drawingCanvas {
+      border: 2px solid #d9d9d9;
+      border-radius: 8px;
+      background: white;
+      cursor: crosshair;
+    }
+
+    .designer-container {
+      height: 600px;
+      border: 1px solid #d9d9d9;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .feature-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+    }
+
+    .feature-item {
+      padding: 15px;
+      background: #f8f9ff;
+      border-radius: 8px;
+      border-left: 4px solid #667eea;
+    }
+
+    .feature-item h4 {
+      margin: 0 0 8px 0;
+      font-size: 14px;
+      color: #667eea;
+    }
+
+    .feature-item p {
+      margin: 0;
+      font-size: 13px;
+      color: #666;
+      line-height: 1.5;
+    }
+
+    .log-panel {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 15px;
+      border-radius: 8px;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 12px;
+      max-height: 300px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .log-entry {
+      margin-bottom: 4px;
+    }
+
+    .log-time {
+      color: #6a9955;
+    }
+
+    .log-info {
+      color: #4ec9b0;
+    }
+
+    .log-success {
+      color: #4fc3f7;
+    }
+
+    .log-error {
+      color: #f48771;
+    }
+
+    @media print {
+      .no-print,
+      .nav-tabs,
+      .demo-controls,
+      .btn,
+      .header,
+      .feature-list,
+      .log-panel {
+        display: none !important;
+      }
+
+      .tab-content {
+        box-shadow: none;
+        padding: 0;
+      }
+
+      .print-content {
+        border: none;
+        background: white;
+      }
+
+      body {
+        background: white;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <div class="header">
+      <h1>🖨️ Printing Plugin - 打印插件</h1>
+      <p>一款功能强大的浏览器打印插件，支持自定义打印范围、多格式导出、动态数据绑定、可视化模板设计等功能</p>
+    </div>
+
+    <div class="nav-tabs">
+      <button class="nav-tab active" data-tab="basic">基础功能</button>
+      <button class="nav-tab" data-tab="export">多格式导出</button>
+      <button class="nav-tab" data-tab="databinding">数据绑定</button>
+      <button class="nav-tab" data-tab="formcanvas">表单&Canvas</button>
+      <button class="nav-tab" data-tab="designer">模板设计器</button>
+      <button class="nav-tab" data-tab="features">功能列表</button>
+    </div>
+
+    <div id="tab-basic" class="tab-content active">
+      <div class="demo-section">
+        <h3>1. 自定义打印范围</h3>
+        <div class="demo-controls">
+          <div class="form-group">
+            <label class="form-label">打印模式:</label>
+            <select class="form-select" id="printMode">
+              <option value="entire">整个页面</option>
+              <option value="element">指定元素</option>
+              <option value="exclude">排除元素</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">选择器:</label>
+            <input type="text" class="form-input" id="selector" value="#printArea" placeholder="如: #myElement">
+          </div>
+          <button class="btn btn-primary" id="btnPrintRange">
+            打印
+          </button>
+        </div>
+      </div>
+
+      <div class="demo-section">
+        <h3>2. 打印样式控制</h3>
+        <div class="demo-controls">
+          <div class="form-group">
+            <label class="form-label">页面大小:</label>
+            <select class="form-select" id="pageSize">
+              <option value="a4">A4</option>
+              <option value="letter">Letter</option>
+              <option value="legal">Legal</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">方向:</label>
+            <select class="form-select" id="orientation">
+              <option value="portrait">纵向</option>
+              <option value="landscape">横向</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">打印方式:</label>
+            <select class="form-select" id="printMethod">
+              <option value="iframe">Iframe 模式</option>
+              <option value="popup">弹窗模式</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" id="btnPrintStyled">
+            带样式打印
+          </button>
+        </div>
+      </div>
+
+      <div class="demo-section">
+        <h3>打印内容预览</h3>
+        <div class="print-content" id="printArea">
+          <div class="invoice-header">
+            <h2>销售发票</h2>
+            <p>INVOICE</p>
+          </div>
+          
+          <div class="invoice-info">
+            <div>
+              <div class="info-row">
+                <span class="info-label">发票编号:</span>
+                <span>INV-2024-001234</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">开票日期:</span>
+                <span>2024-04-24</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">客户名称:</span>
+                <span>张三科技有限公司</span>
+              </div>
+            </div>
+            <div>
+              <div class="info-row">
+                <span class="info-label">联系电话:</span>
+                <span>138-0000-0000</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">邮箱:</span>
+                <span>contact@example.com</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">地址:</span>
+                <span>北京市朝阳区xxx路xxx号</span>
+              </div>
+            </div>
+          </div>
+
+          <table class="invoice-table">
+            <thead>
+              <tr>
+                <th width="50">序号</th>
+                <th>商品名称</th>
+                <th width="100">数量</th>
+                <th width="100">单价</th>
+                <th width="100">金额</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>产品A - 标准版</td>
+                <td>2</td>
+                <td>¥1,500.00</td>
+                <td>¥3,000.00</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>产品B - 专业版</td>
+                <td>1</td>
+                <td>¥2,800.00</td>
+                <td>¥2,800.00</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>服务C - 年度维护</td>
+                <td>1</td>
+                <td>¥5,000.00</td>
+                <td>¥5,000.00</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="invoice-total">
+            总计金额: ¥10,800.00
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-section no-print">
+        <h3>3. 浏览器兼容性信息</h3>
+        <div class="demo-controls">
+          <button class="btn btn-info" id="btnGetBrowserInfo">
+            获取浏览器信息
+          </button>
+        </div>
+        <div class="log-panel" id="logPanel">
+          <div class="log-entry"><span class="log-time">[系统]</span> <span class="log-info">日志面板已就绪</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-export" class="tab-content">
+      <div class="demo-section">
+        <h3>多格式导出功能</h3>
+        <div class="demo-controls">
+          <div class="form-group">
+            <label class="form-label">导出格式:</label>
+            <select class="form-select" id="exportFormat">
+              <option value="pdf">PDF 文档</option>
+              <option value="png">PNG 图片</option>
+              <option value="jpg">JPG 图片</option>
+              <option value="html">HTML 文件</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">文件名:</label>
+            <input type="text" class="form-input" id="exportFilename" value="invoice" placeholder="文件名">
+          </div>
+          <div class="form-group">
+            <label class="form-label">图片质量:</label>
+            <select class="form-select" id="exportQuality">
+              <option value="1.0">最高 (100%)</option>
+              <option value="0.9" selected>高 (90%)</option>
+              <option value="0.7">中 (70%)</option>
+              <option value="0.5">低 (50%)</option>
+            </select>
+          </div>
+          <button class="btn btn-success" id="btnExport">
+            导出文件
+          </button>
+        </div>
+        <p style="color: #666; font-size: 13px;">
+          支持导出为 PDF、PNG、JPG、HTML 格式。PDF 导出使用 jsPDF，图片导出使用 html2canvas。
+        </p>
+      </div>
+
+      <div class="demo-section">
+        <h3>批量打印功能</h3>
+        <div class="demo-controls">
+          <button class="btn btn-warning" id="btnBatchPrint">
+            模拟批量打印 (3个文档)
+          </button>
+          <button class="btn btn-info" id="btnQueuePrint">
+            使用打印队列
+          </button>
+        </div>
+        <p style="color: #666; font-size: 13px;">
+          批量打印支持处理多个打印任务，可设置任务间隔时间。静默打印需要浏览器扩展或本地服务支持。
+        </p>
+      </div>
+    </div>
+
+    <div id="tab-databinding" class="tab-content">
+      <div class="demo-section">
+        <h3>动态数据绑定</h3>
+        <div class="demo-controls">
+          <button class="btn btn-primary" id="btnBindData">
+            绑定数据
+          </button>
+          <button class="btn btn-success" id="btnBindWithHelpers">
+            使用助手函数
+          </button>
+          <button class="btn btn-warning" id="btnRenderTemplate">
+            渲染完整模板
+          </button>
+        </div>
+      </div>
+
+      <div class="demo-section">
+        <h3>模板预览</h3>
+        <div class="print-content" id="dataBoundArea">
+          <div class="invoice-header">
+            <h2>{{ companyName }}</h2>
+            <p>{{ title }}</p>
+          </div>
+          
+          <div class="invoice-info">
+            <div>
+              <div class="info-row">
+                <span class="info-label">发票编号:</span>
+                <span>{{ invoiceNo }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">开票日期:</span>
+                <span>{{ formatDate(date, 'YYYY-MM-DD') }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">客户名称:</span>
+                <span>{{ customer.name }}</span>
+              </div>
+            </div>
+            <div>
+              <div class="info-row">
+                <span class="info-label">联系电话:</span>
+                <span>{{ customer.phone }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">邮箱:</span>
+                <span>{{ customer.email }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">状态:</span>
+                <span>{{#if paid}}已付款{{#else}}待付款{{/if}}</span>
+              </div>
+            </div>
+          </div>
+
+          <table class="invoice-table">
+            <thead>
+              <tr>
+                <th width="50">序号</th>
+                <th>商品名称</th>
+                <th width="100">数量</th>
+                <th width="100">单价</th>
+                <th width="100">金额</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each items as item, i}}
+              <tr>
+                <td>{{ i + 1 }}</td>
+                <td>{{ item.name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>¥{{ formatNumber(item.price) }}</td>
+                <td>¥{{ formatNumber(item.quantity * item.price) }}</td>
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
+
+          <div class="invoice-total">
+            总计金额: ¥{{ formatCurrency(totalAmount) }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-formcanvas" class="tab-content">
+      <div class="demo-section">
+        <h3>表单元素打印支持</h3>
+        <div class="form-demo" id="formArea">
+          <div class="form-row">
+            <div class="form-field">
+              <label>姓名:</label>
+              <input type="text" class="form-input" value="张三" placeholder="请输入姓名">
+            </div>
+            <div class="form-field">
+              <label>邮箱:</label>
+              <input type="email" class="form-input" value="zhangsan@example.com" placeholder="请输入邮箱">
+            </div>
+            <div class="form-field">
+              <label>电话:</label>
+              <input type="tel" class="form-input" value="138-0000-0000" placeholder="请输入电话">
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-field">
+              <label>部门:</label>
+              <select class="form-select" style="width: 100%;">
+                <option value="">请选择</option>
+                <option value="tech" selected>技术部</option>
+                <option value="sales">销售部</option>
+                <option value="hr">人事部</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>入职日期:</label>
+              <input type="date" class="form-input" value="2024-01-15" style="width: 100%;">
+            </div>
+            <div class="form-field">
+              <label>薪资范围:</label>
+              <input type="range" min="5000" max="50000" value="15000" style="width: 100%;">
+              <span style="font-size: 12px; color: #666;">15000元</span>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label>技能:</label>
+              <div class="checkbox-group">
+                <label class="checkbox-item">
+                  <input type="checkbox" checked> JavaScript
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" checked> TypeScript
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox"> Python
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox"> Java
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label>合同类型:</label>
+              <div class="radio-group">
+                <label class="radio-item">
+                  <input type="radio" name="contract" checked> 全职
+                </label>
+                <label class="radio-item">
+                  <input type="radio" name="contract"> 兼职
+                </label>
+                <label class="radio-item">
+                  <input type="radio" name="contract"> 实习生
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-field" style="flex: 1;">
+              <label>个人简介:</label>
+              <textarea class="form-input" style="width: 100%; height: 100px; resize: vertical;">本人从事前端开发工作5年，精通Vue、React等主流框架，具有丰富的项目经验。</textarea>
+            </div>
+          </div>
+        </div>
+        
+        <div class="demo-controls" style="margin-top: 20px;">
+          <button class="btn btn-primary" id="btnPrintForm">
+            打印表单
+          </button>
+          <button class="btn btn-info" id="btnGetFormValues">
+            获取表单值
+          </button>
+        </div>
+      </div>
+
+      <div class="demo-section">
+        <h3>Canvas 绘图支持</h3>
+        <div class="canvas-container">
+          <div class="canvas-box">
+            <h4>绘图区域 (在下方绘制签名)</h4>
+            <canvas id="drawingCanvas" width="400" height="200"></canvas>
+            <div class="demo-controls" style="margin-top: 10px;">
+              <div class="form-group">
+                <label class="form-label">颜色:</label>
+                <input type="color" value="#000000" id="canvasColor">
+              </div>
+              <div class="form-group">
+                <label class="form-label">粗细:</label>
+                <select class="form-select" id="canvasLineWidth">
+                  <option value="1">细</option>
+                  <option value="3" selected>中</option>
+                  <option value="5">粗</option>
+                </select>
+              </div>
+              <button class="btn btn-danger" id="btnClearCanvas">
+                清除
+              </button>
+            </div>
+          </div>
+          <div class="canvas-box">
+            <h4>签名预览</h4>
+            <img id="signaturePreview" alt="签名预览" style="border: 2px dashed #d9d9d9; border-radius: 8px; width: 400px; height: 200px;">
+            <div class="demo-controls" style="margin-top: 10px;">
+              <button class="btn btn-success" id="btnCaptureCanvas">
+                捕获为图片
+              </button>
+              <button class="btn btn-primary" id="btnPrintCanvas">
+                打印Canvas
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-designer" class="tab-content">
+      <div class="demo-section">
+        <h3>可视化模板设计器</h3>
+        <p style="color: #666; font-size: 13px; margin-bottom: 20px;">
+          从左侧工具箱拖拽元素到画布，支持：文本、图片、线条、矩形、表格、条形码、二维码、数据字段等。
+          <br>快捷键：Ctrl+Z 撤销, Ctrl+Y 重做, Delete 删除, 方向键 微调位置。
+        </p>
+        <div class="designer-container" id="designerContainer"></div>
+      </div>
+      <div class="demo-controls" style="margin-top: 20px;">
+        <button class="btn btn-success" id="btnGetTemplate">
+          获取模板HTML
+        </button>
+        <button class="btn btn-info" id="btnSaveTemplate">
+          保存为JSON
+        </button>
+        <button class="btn btn-primary" id="btnPrintTemplate">
+          打印模板
+        </button>
+      </div>
+    </div>
+
+    <div id="tab-features" class="tab-content">
+      <div class="feature-list">
+        <div class="feature-item">
+          <h4>🎯 自定义打印范围</h4>
+          <p>可选择打印整个页面、特定元素（如表格、表格区域）或排除某些元素（如广告、导航栏），避免冗余内容出现在打印输出中。</p>
+        </div>
+        <div class="feature-item">
+          <h4>🎨 样式控制与媒体查询</h4>
+          <p>支持通过 CSS @media print 定义专用于打印的样式，隐藏非必要元素、调整字体大小、边距等，确保打印效果整洁美观。</p>
+        </div>
+        <div class="feature-item">
+          <h4>🌐 跨浏览器兼容性</h4>
+          <p>兼容主流浏览器（Chrome、Firefox、Edge、Safari 等），自动检测浏览器环境并应用兼容性修复。</p>
+        </div>
+        <div class="feature-item">
+          <h4>📁 多格式导出支持</h4>
+          <p>支持将打印内容导出为 PDF（使用 jsPDF）、PNG、JPG（使用 html2canvas）、HTML 等格式，便于存档或分享。</p>
+        </div>
+        <div class="feature-item">
+          <h4>🔗 动态数据绑定</h4>
+          <p>插件可将后端数据（如订单信息、用户资料）动态填充到预设模板中，适用于票据、发票、报表等场景。</p>
+        </div>
+        <div class="feature-item">
+          <h4>🖨️ 静默打印与批量打印</h4>
+          <p>支持无需弹出对话框的"静默打印"（需浏览器扩展或本地服务）；同时支持批量处理多个打印任务和打印队列管理。</p>
+        </div>
+        <div class="feature-item">
+          <h4>🎮 可视化模板设计器</h4>
+          <p>提供拖拽式设计器，允许非技术人员通过界面配置打印模板，支持撤销/重做、属性编辑、网格吸附等功能。</p>
+        </div>
+        <div class="feature-item">
+          <h4>📝 表单与 Canvas 元素支持</h4>
+          <p>插件能正确捕获并打印用户输入的表单值（文本框、复选框、单选框、下拉框等）以及 Canvas 绘图内容，确保打印完整性。</p>
+        </div>
+        <div class="feature-item">
+          <h4>📦 助手函数系统</h4>
+          <p>内置多种数据格式化助手函数：formatDate（日期格式化）、formatNumber（数字格式化）、formatCurrency（货币格式化）、uppercase/lowercase（大小写转换）等。</p>
+        </div>
+        <div class="feature-item">
+          <h4>🧩 条件与循环渲染</h4>
+          <p>模板系统支持 {{#if}} {{/if}} 条件渲染和 {{#each}} {{/each}} 循环渲染，灵活处理复杂数据展示需求。</p>
+        </div>
+        <div class="feature-item">
+          <h4>📐 网格与标尺</h4>
+          <p>模板设计器提供网格吸附、像素级定位、顶部/左侧标尺显示，帮助精准对齐元素，制作专业级打印模板。</p>
+        </div>
+        <div class="feature-item">
+          <h4>🔄 撤销/重做</h4>
+          <p>完整的历史记录管理，支持最多50步撤销/重做操作，让模板设计更加安心。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import PrintingPlugin from './src/main.js';
+
+    const printer = new PrintingPlugin();
+    let designer = null;
+
+    function log(message, type = 'info') {
+      const panel = document.getElementById('logPanel');
+      const time = new Date().toLocaleTimeString();
+      const typeClass = type === 'error' ? 'log-error' : type === 'success' ? 'log-success' : 'log-info';
+      
+      const entry = document.createElement('div');
+      entry.className = 'log-entry';
+      entry.innerHTML = `<span class="log-time">[${time}]</span> <span class="${typeClass}">${message}</span>`;
+      
+      panel.appendChild(entry);
+      panel.scrollTop = panel.scrollHeight;
+    }
+
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        
+        tab.classList.add('active');
+        const tabId = tab.dataset.tab;
+        document.getElementById(`tab-${tabId}`).classList.add('active');
+
+        if (tabId === 'designer' && !designer) {
+          setTimeout(() => {
+            designer = printer.enableDesigner('#designerContainer');
+            log('模板设计器已初始化', 'success');
+          }, 100);
+        }
+      });
+    });
+
+    document.getElementById('btnPrintRange').addEventListener('click', () => {
+      const mode = document.getElementById('printMode').value;
+      const selector = document.getElementById('selector').value;
+
+      let options = {};
+
+      switch (mode) {
+        case 'entire':
+          log('打印整个页面');
+          break;
+        case 'element':
+          options = {
+            range: {
+              mode: 'element',
+              selector: selector
+            }
+          };
+          log(`打印指定元素: ${selector}`);
+          break;
+        case 'exclude':
+          options = {
+            range: {
+              mode: 'entire',
+              excludeSelectors: ['.no-print', 'nav', 'header']
+            }
+          };
+          log('打印整个页面，排除导航和头部');
+          break;
+      }
+
+      printer.print('#printArea', options)
+        .then(() => log('打印任务已发送', 'success'))
+        .catch(err => log(`打印失败: ${err.message}`, 'error'));
+    });
+
+    document.getElementById('btnPrintStyled').addEventListener('click', () => {
+      const pageSize = document.getElementById('pageSize').value;
+      const orientation = document.getElementById('orientation').value;
+      const printMethod = document.getElementById('printMethod').value;
+
+      log(`带样式打印 - 页面: ${pageSize}, 方向: ${orientation}, 方式: ${printMethod}`);
+
+      printer.print('#printArea', {
+        printMode: printMethod,
+        style: {
+          mediaPrint: true,
+          customStyles: `
+            @page {
+              size: ${pageSize} ${orientation};
+              margin: 1in;
+            }
+            .invoice-table {
+              border-collapse: collapse !important;
+            }
+            .invoice-table th, .invoice-table td {
+              border: 1px solid #333 !important;
+            }
+          `
+        }
+      }).then(() => log('带样式打印任务已发送', 'success'))
+        .catch(err => log(`打印失败: ${err.message}`, 'error'));
+    });
+
+    document.getElementById('btnGetBrowserInfo').addEventListener('click', () => {
+      const info = printer.browserCompat.getInfo();
+      log('=== 浏览器信息 ===');
+      log(`浏览器: ${info.name} ${info.version}`);
+      log(`移动设备: ${info.isMobile ? '是' : '否'}`);
+      log(`支持静默打印: ${info.supportsSilentPrint ? '是' : '否'}`);
+      log(`支持背景色打印: ${info.supportsBackgroundColors ? '是' : '否'}`);
+      log(`打印方式: ${info.printMethod}`);
+    });
+
+    document.getElementById('btnExport').addEventListener('click', () => {
+      const format = document.getElementById('exportFormat').value;
+      const filename = document.getElementById('exportFilename').value;
+      const quality = parseFloat(document.getElementById('exportQuality').value);
+
+      log(`导出为 ${format.toUpperCase()} 格式，质量: ${quality * 100}%`);
+
+      printer.export('#printArea', format, {
+        export: {
+          filename: filename,
+          quality: quality,
+        }
+      }).then(result => {
+        log(`导出成功: ${result.filename}, 大小: ${(result.size / 1024).toFixed(2)}KB`, 'success');
+      }).catch(err => {
+        log(`导出失败: ${err.message}`, 'error');
+      });
+    });
+
+    document.getElementById('btnBatchPrint').addEventListener('click', () => {
+      log('模拟批量打印 3 个文档...');
+
+      const items = [
+        { content: '#printArea', options: {} },
+        { content: '#printArea', options: {} },
+        { content: '#printArea', options: {} },
+      ];
+
+      printer.batchPrint(items, { batchDelay: 1000 })
+        .then(result => {
+          log(`批量打印完成: 成功 ${result.printed}, 失败 ${result.failed}`, 
+              result.failed === 0 ? 'success' : 'error');
+        })
+        .catch(err => log(`批量打印失败: ${err.message}`, 'error'));
+    });
+
+    document.getElementById('btnQueuePrint').addEventListener('click', () => {
+      log('添加任务到打印队列...');
+      
+      printer.silentPrint.addToQueue({ content: '#printArea', options: {} });
+      printer.silentPrint.addToQueue({ content: '#printArea', options: {} });
+
+      const status = printer.silentPrint.getQueueStatus();
+      log(`队列状态: 共 ${status.total} 个任务`);
+      
+      printer.silentPrint.processQueue()
+        .then(result => {
+          log(`队列处理完成: 成功 ${result.completed}, 失败 ${result.failed}`, 'success');
+        });
+    });
+
+    const sampleData = {
+      companyName: '科技有限公司',
+      title: '销售发票',
+      invoiceNo: 'INV-2024-009999',
+      date: new Date(),
+      customer: {
+        name: '李四贸易公司',
+        phone: '139-9999-9999',
+        email: 'lisi@example.com',
+      },
+      paid: true,
+      items: [
+        { name: '产品X - 高级版', quantity: 3, price: 2500 },
+        { name: '服务Y - 技术支持', quantity: 1, price: 8000 },
+        { name: '配件Z - 标准件', quantity: 10, price: 120 },
+      ],
+      totalAmount: 16700,
+    };
+
+    document.getElementById('btnBindData').addEventListener('click', () => {
+      log('绑定基础数据...');
+      
+      const template = document.getElementById('dataBoundArea').innerHTML;
+      const result = printer.renderTemplate(sampleData);
+      
+      log('基础数据绑定完成', 'success');
+    });
+
+    document.getElementById('btnBindWithHelpers').addEventListener('click', () => {
+      log('使用助手函数绑定数据...');
+      
+      printer.dataBinding.registerHelper('double', (value) => value * 2);
+      
+      log('已注册自定义助手函数: double()', 'info');
+      log('内置助手函数: formatDate, formatNumber, formatCurrency, uppercase, lowercase, default, length, join', 'info');
+    });
+
+    let originalTemplateHTML = null;
+    
+    document.getElementById('btnRenderTemplate').addEventListener('click', () => {
+      const templateElement = document.getElementById('dataBoundArea');
+      
+      if (!originalTemplateHTML) {
+        originalTemplateHTML = templateElement.innerHTML;
+      }
+      
+      log('渲染完整模板...');
+      
+      const renderedHTML = printer.dataBinding.render(originalTemplateHTML, sampleData);
+      templateElement.innerHTML = renderedHTML;
+      
+      log('模板渲染完成', 'success');
+      
+      document.getElementById('btnRenderTemplate').textContent = '恢复原始模板';
+      document.getElementById('btnRenderTemplate').classList.remove('btn-warning');
+      document.getElementById('btnRenderTemplate').classList.add('btn-danger');
+      
+      document.getElementById('btnRenderTemplate').onclick = restoreOriginalTemplate;
+    });
+    
+    function restoreOriginalTemplate() {
+      const templateElement = document.getElementById('dataBoundArea');
+      
+      if (originalTemplateHTML) {
+        templateElement.innerHTML = originalTemplateHTML;
+        log('已恢复原始模板', 'info');
+      }
+      
+      document.getElementById('btnRenderTemplate').textContent = '渲染完整模板';
+      document.getElementById('btnRenderTemplate').classList.remove('btn-danger');
+      document.getElementById('btnRenderTemplate').classList.add('btn-warning');
+      
+      document.getElementById('btnRenderTemplate').onclick = function() {
+        const templateElement = document.getElementById('dataBoundArea');
+        
+        if (!originalTemplateHTML) {
+          originalTemplateHTML = templateElement.innerHTML;
+        }
+        
+        log('渲染完整模板...');
+        
+        const renderedHTML = printer.dataBinding.render(originalTemplateHTML, sampleData);
+        templateElement.innerHTML = renderedHTML;
+        
+        log('模板渲染完成', 'success');
+        
+        document.getElementById('btnRenderTemplate').textContent = '恢复原始模板';
+        document.getElementById('btnRenderTemplate').classList.remove('btn-warning');
+        document.getElementById('btnRenderTemplate').classList.add('btn-danger');
+        
+        document.getElementById('btnRenderTemplate').onclick = restoreOriginalTemplate;
+      };
+    }
+
+    const formArea = document.getElementById('formArea');
+    const rangeInput = formArea.querySelector('input[type="range"]');
+    const rangeValueSpan = rangeInput ? rangeInput.nextElementSibling : null;
+    
+    if (rangeInput && rangeValueSpan) {
+      rangeInput.addEventListener('input', () => {
+        rangeValueSpan.textContent = rangeInput.value + '元';
+      });
+    }
+
+    document.getElementById('btnPrintForm').addEventListener('click', () => {
+      log('打印表单内容...');
+      
+      printer.print('#formArea')
+        .then(() => log('表单打印任务已发送', 'success'))
+        .catch(err => log(`打印失败: ${err.message}`, 'error'));
+    });
+
+    document.getElementById('btnGetFormValues').addEventListener('click', () => {
+      log('获取表单值...');
+      
+      const inputs = formArea.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="range"]');
+      const select = formArea.querySelector('select');
+      const textarea = formArea.querySelector('textarea');
+      const checkboxes = formArea.querySelectorAll('input[type="checkbox"]:checked');
+      const radios = formArea.querySelectorAll('input[type="radio"]:checked');
+
+      log('=== 表单数据 ===');
+      inputs.forEach(input => {
+        const type = input.type === 'range' ? '薪资范围' : '输入框';
+        log(`${type}: ${input.value}`);
+      });
+      log(`下拉框: ${select.value}`);
+      log(`文本域: ${textarea.value.substring(0, 30)}...`);
+      log(`选中复选框: ${checkboxes.length} 个`);
+      if (radios.length > 0) {
+        const selectedRadio = Array.from(radios).find(r => r.checked);
+        if (selectedRadio) {
+          const label = selectedRadio.closest('label');
+          log(`选中单选框: ${label ? label.textContent.trim() : '已选择'}`);
+        }
+      }
+    });
+
+    const canvas = document.getElementById('drawingCanvas');
+    const ctx = canvas.getContext('2d');
+    let isDrawing = false;
+    let lastX = 0;
+    let lastY = 0;
+
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 3;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+
+    function getCanvasPos(e) {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      };
+    }
+
+    canvas.addEventListener('mousedown', (e) => {
+      isDrawing = true;
+      const pos = getCanvasPos(e);
+      lastX = pos.x;
+      lastY = pos.y;
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+      if (!isDrawing) return;
+      
+      const pos = getCanvasPos(e);
+      
+      ctx.beginPath();
+      ctx.moveTo(lastX, lastY);
+      ctx.lineTo(pos.x, pos.y);
+      ctx.stroke();
+      
+      lastX = pos.x;
+      lastY = pos.y;
+    });
+
+    canvas.addEventListener('mouseup', () => isDrawing = false);
+    canvas.addEventListener('mouseout', () => isDrawing = false);
+
+    document.getElementById('canvasColor').addEventListener('change', (e) => {
+      ctx.strokeStyle = e.target.value;
+    });
+
+    document.getElementById('canvasLineWidth').addEventListener('change', (e) => {
+      ctx.lineWidth = parseInt(e.target.value);
+    });
+
+    document.getElementById('btnClearCanvas').addEventListener('click', () => {
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      log('Canvas 已清除');
+    });
+
+    document.getElementById('btnCaptureCanvas').addEventListener('click', () => {
+      log('捕获 Canvas 为图片...');
+      
+      const dataURL = printer.formCanvasSupport.canvasToImage(canvas, 'png');
+      document.getElementById('signaturePreview').src = dataURL;
+      
+      log('Canvas 已捕获为图片', 'success');
+    });
+
+    document.getElementById('btnPrintCanvas').addEventListener('click', () => {
+      log('打印 Canvas 内容...');
+      
+      printer.print('#drawingCanvas')
+        .then(() => log('Canvas 打印任务已发送', 'success'))
+        .catch(err => log(`打印失败: ${err.message}`, 'error'));
+    });
+
+    document.getElementById('btnGetTemplate').addEventListener('click', () => {
+      if (!designer) {
+        log('请先切换到"模板设计器"标签页', 'error');
+        return;
+      }
+      
+      const template = designer.getTemplate();
+      log('=== 模板HTML ===');
+      log(template);
+    });
+
+    document.getElementById('btnSaveTemplate').addEventListener('click', () => {
+      if (!designer) {
+        log('请先切换到"模板设计器"标签页', 'error');
+        return;
+      }
+      
+      const json = designer.getJSON();
+      log('模板已保存为JSON', 'success');
+      log(JSON.stringify(json, null, 2));
+    });
+
+    document.getElementById('btnPrintTemplate').addEventListener('click', () => {
+      if (!designer) {
+        log('请先切换到"模板设计器"标签页', 'error');
+        return;
+      }
+      
+      log('打印当前模板...');
+      
+      const template = designer.getTemplate();
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = template;
+      tempDiv.style.position = 'fixed';
+      tempDiv.style.left = '-9999px';
+      document.body.appendChild(tempDiv);
+      
+      printer.print(tempDiv)
+        .then(() => {
+          log('模板打印任务已发送', 'success');
+          document.body.removeChild(tempDiv);
+        })
+        .catch(err => {
+          log(`打印失败: ${err.message}`, 'error');
+          document.body.removeChild(tempDiv);
+        });
+    });
+
+    log('Printing Plugin 已初始化完成', 'success');
+    log('请选择上方标签页体验不同功能');
+  </script>
+</body>
+</html>
